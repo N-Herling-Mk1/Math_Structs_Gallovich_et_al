@@ -2,17 +2,19 @@
    Loads content.json, builds the chapter nav, renders entries block-by-block,
    and provides a registry of reusable, parametrized graph widgets. */
 
+/* TRON light — luminous light-ground panels: cyan primary, amber energy accent */
 const PALETTE = {
-  r:'#fbbf24', q:'#22d3ee', qm:'#34d399',
-  diag:'#64748b', mark:'#fbbf24',
-  grid:'rgba(148,163,184,0.10)', zero:'rgba(148,163,184,0.30)',
-  markGrid:'rgba(251,191,36,0.45)',
-  tick:'#7b8794', font:"'Share Tech Mono', monospace",
+  r:'#e07b0a', q:'#0891b2', qm:'#059669',
+  diag:'#64748b', mark:'#ea580c',
+  grid:'rgba(12,74,90,0.10)', zero:'rgba(12,74,90,0.32)',
+  markGrid:'rgba(234,88,12,0.42)',
+  tick:'#3f5a64', font:"'Share Tech Mono', monospace",
+  amber:'#c2410c',
   // svg
-  cellFill:'#0d1622', cellStroke:'rgba(34,211,238,0.22)', cellText:'#9fb3c8',
-  zeroFill:'rgba(34,211,238,0.10)',
-  markFill:'rgba(251,191,36,0.16)', markText:'#fbbf24',
-  cyanRamp:['#155e6b','#0e8aa0','#22b8cf','#5de0ec']
+  cellFill:'#ffffff', cellStroke:'rgba(8,145,178,0.32)', cellText:'#16414c',
+  zeroFill:'rgba(8,145,178,0.13)',
+  markFill:'rgba(234,88,12,0.13)', markText:'#c2410c',
+  cyanRamp:['#0a4f5c','#0d7c91','#159fb6','#37bccf']
 };
 
 let CHARTS = [];
@@ -289,7 +291,7 @@ const WIDGETS = {
     const cw=64,chh=44,gap=6,padL=52,padB=34,padT=22,padR=10;
     const gridW=cols*(cw+gap)-gap, gridH=b*(chh+gap)-gap;
     const W=padL+gridW+padR, H=padT+gridH+padB;
-    let s=`<svg viewBox="0 0 ${W} ${H}" class="svgfig" preserveAspectRatio="xMidYMid meet" role="img"><title>a = b·q + r lattice</title>`;
+    let s=`<svg viewBox="0 0 ${W} ${H}" class="svgfig" preserveAspectRatio="xMidYMid meet" role="img"><title>a = b·q + r lattice</title><defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
     for(let ri=0;ri<b;ri++){
       const rval=b-1-ri, y=padT+ri*(chh+gap);
       for(let qq=0;qq<cols;qq++){
@@ -298,7 +300,7 @@ const WIDGETS = {
         const fill=isMark?PALETTE.markFill:(isZero?PALETTE.zeroFill:PALETTE.cellFill);
         const stroke=isMark?PALETTE.mark:(isZero?PALETTE.q:PALETTE.cellStroke);
         const tcol=isMark?PALETTE.markText:(isZero?PALETTE.q:PALETTE.cellText);
-        s+=`<rect x="${x}" y="${y}" width="${cw}" height="${chh}" rx="5" fill="${fill}" stroke="${stroke}" stroke-width="${isMark?1.6:0.75}"/>`;
+        s+=`<rect x="${x}" y="${y}" width="${cw}" height="${chh}" rx="5" fill="${fill}" stroke="${stroke}" stroke-width="${isMark?1.6:0.75}"${isMark?' filter="url(#glow)"':''}/>`;
         s+=`<text x="${x+cw/2}" y="${y+chh/2}" text-anchor="middle" dominant-baseline="central" font-family="${PALETTE.font}" font-size="15" fill="${tcol}">${aVal}</text>`;
       }
       s+=`<text x="${padL-18}" y="${y+chh/2}" text-anchor="middle" dominant-baseline="central" font-family="${PALETTE.font}" font-size="13" fill="${PALETTE.tick}">${rval}</text>`;
@@ -319,7 +321,7 @@ const WIDGETS = {
     const W=680,H=300, left=56,right=600,top=28,bottom=250;
     const X=b=>left+(b/bMax)*(right-left);
     const Y=a=>bottom-(a/aMax)*(bottom-top);
-    let s=`<svg viewBox="0 0 ${W} ${H}" class="svgfig" preserveAspectRatio="xMidYMid meet" role="img"><title>Fix q=${q}: parallel lines a=${q}b+r, sliced at b=${bSlice}</title>`;
+    let s=`<svg viewBox="0 0 ${W} ${H}" class="svgfig" preserveAspectRatio="xMidYMid meet" role="img"><title>Fix q=${q}: parallel lines a=${q}b+r, sliced at b=${bSlice}</title><defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
     // axes
     s+=`<line x1="${left}" y1="${bottom}" x2="${left}" y2="${top-4}" stroke="${PALETTE.tick}" stroke-width="1.2"/>`;
     s+=`<line x1="${left}" y1="${bottom}" x2="${right+8}" y2="${bottom}" stroke="${PALETTE.tick}" stroke-width="1.2"/>`;
@@ -344,7 +346,7 @@ const WIDGETS = {
     for(let r=0;r<=rmax;r++){
       const a=q*bSlice+r, isMark=(a===mark);
       const col=isMark?PALETTE.mark:PALETTE.cyanRamp[r%PALETTE.cyanRamp.length];
-      s+=`<circle cx="${X(bSlice)}" cy="${Y(a)}" r="${isMark?7:5}" fill="${col}"/>`;
+      s+=`<circle cx="${X(bSlice)}" cy="${Y(a)}" r="${isMark?7:5}" fill="${col}"${isMark?' filter="url(#glow)"':''}/>`;
       s+=`<text x="${X(bSlice)+12}" y="${Y(a)}" dominant-baseline="central" font-family="${PALETTE.font}" font-size="11" fill="${isMark?PALETTE.mark:PALETTE.tick}">r = ${r}${isMark?'  (a = '+mark+')':''}</text>`;
     }
     // reset open dot
